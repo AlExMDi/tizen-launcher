@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <!-- Las TVs Samsung usan un viewport de 1920 px de ancho; diseñamos a 1920×1080 y escalamos en JS. -->
+  <meta name="viewport" content="width=1920, user-scalable=no">
+  <title>Launcher</title>
+  <link rel="stylesheet" href="./src/styles/main.css">
+</head>
+<body>
+  <div id="stage">
+    <div id="bg">
+      <div class="bg-layer" id="bg-a"></div>
+      <div class="bg-layer" id="bg-b"></div>
+      <div class="bg-shade"></div>
+    </div>
+
+    <div id="device-name"></div>
+
+    <div id="list" aria-live="polite"></div>
+
+    <div id="hero">
+      <div class="hero-layer" id="hero-a"></div>
+      <div class="hero-layer" id="hero-b"></div>
+    </div>
+
+    <div id="clock">
+      <div class="clock-time"><span id="clock-hm"></span><span id="clock-ampm"></span></div>
+      <div id="clock-date"></div>
+    </div>
+
+    <div id="settings" class="hidden"></div>
+    <div id="toast"></div>
+  </div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

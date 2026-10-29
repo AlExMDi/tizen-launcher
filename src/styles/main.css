@@ -1,0 +1,233 @@
+/* Inter embebida: la tele no debe depender de Google Fonts (puede no haber red y añade latencia). */
+@font-face {
+  font-family: 'Inter';
+  src: url('../assets/fonts/inter-latin-wght.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
+
+/* Variables CSS: soportadas desde Chromium 49, sin riesgo en M85. */
+:root {
+  --fg: #fff;
+  --fg-dim: rgba(255, 255, 255, 0.55);
+  --fg-faint: rgba(255, 255, 255, 0.35);
+  --panel: rgba(16, 16, 18, 0.92);
+  --accent: #fff;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --pad-x: 140px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  color: var(--fg);
+  font-family: 'Inter', -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  cursor: none; /* en la tele no hay ratón; en el Mac también lo escondemos para ver la UI real */
+}
+
+/* Escenario fijo de 1920×1080. main.js lo escala al viewport real (en la TV, escala 1). */
+#stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  transform-origin: 0 0;
+}
+
+/* ---------- Fondo ---------- */
+#bg, .bg-layer, .bg-shade { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+#bg { background: radial-gradient(ellipse at 70% 40%, #2a2f3a 0%, #0b0c10 70%); }
+.bg-layer {
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 2.4s ease;
+}
+.bg-layer.visible { opacity: 1; }
+/* El degradado es estático: nunca se anima (sería repintar 1920×1080 en cada frame). */
+.bg-shade {
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.78) 0%, rgba(0, 0, 0, 0.45) 38%, rgba(0, 0, 0, 0) 68%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 42%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0) 18%);
+}
+
+/* ---------- Texto superior derecho ---------- */
+#device-name {
+  position: absolute;
+  top: 64px;
+  right: var(--pad-x);
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--fg-dim);
+}
+
+/* ---------- Lista ---------- */
+#list {
+  position: absolute;
+  left: var(--pad-x);
+  top: 0;
+  width: 900px;
+  height: 100%;
+}
+.list-item, .list-label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  transform-origin: 0 0;
+  transition: transform 340ms var(--ease), opacity 340ms var(--ease);
+}
+.list-item {
+  font-size: 84px;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.list-item.focused { font-weight: 600; }
+.list-label {
+  font-size: 22px;
+  line-height: 40px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.no-anim .list-item, .no-anim .list-label { transition: none; }
+
+/* ---------- Icono grande ---------- */
+#hero {
+  position: absolute;
+  left: 1060px;
+  top: 250px;
+  width: 560px;
+  height: 420px;
+}
+.hero-layer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.94);
+  transition: opacity 420ms var(--ease), transform 520ms var(--ease);
+}
+.hero-layer.visible { opacity: 1; transform: scale(1); }
+.hero-img { max-width: 340px; max-height: 340px; }
+.hero-mono {
+  width: 300px;
+  height: 300px;
+  border-radius: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 170px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: rgba(255, 255, 255, 0.92);
+  /* Sombra estática (no se anima): pintar sombras animadas es muy caro en la TV. */
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+.hero-glyph { width: 260px; height: 260px; color: rgba(255, 255, 255, 0.9); }
+.hero-glyph svg { width: 100%; height: 100%; }
+
+/* ---------- Reloj ---------- */
+#clock {
+  position: absolute;
+  right: var(--pad-x);
+  bottom: 96px;
+  text-align: right;
+}
+.clock-time { font-size: 148px; line-height: 1; font-weight: 300; letter-spacing: -0.04em; }
+#clock-ampm { font-size: 40px; font-weight: 400; letter-spacing: 0; margin-left: 14px; color: var(--fg-dim); }
+#clock-ampm:empty { display: none; }
+#clock-date { margin-top: 14px; font-size: 32px; font-weight: 400; color: var(--fg-dim); }
+
+/* ---------- Toast ---------- */
+#toast {
+  position: absolute;
+  left: 50%;
+  bottom: 64px;
+  max-width: 1000px;
+  padding: 20px 36px;
+  border-radius: 999px;
+  background: var(--panel);
+  font-size: 26px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate3d(-50%, 24px, 0);
+  transition: opacity 260ms var(--ease), transform 260ms var(--ease);
+}
+#toast.show { opacity: 1; transform: translate3d(-50%, 0, 0); }
+
+/* ---------- Ajustes ---------- */
+/* Al abrir ajustes, la home se atenúa con opacity (barato) en vez de con un blur. */
+#list, #hero, #clock, #device-name { transition: opacity 300ms var(--ease); }
+.settings-open #list, .settings-open #hero, .settings-open #clock, .settings-open #device-name { opacity: 0.25; }
+
+#settings {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 860px;
+  height: 100%;
+  padding: 72px 96px 0 80px;
+  background: var(--panel);
+  opacity: 0;
+  transform: translate3d(60px, 0, 0);
+  transition: opacity 300ms var(--ease), transform 300ms var(--ease);
+}
+#settings.open { opacity: 1; transform: translate3d(0, 0, 0); }
+.s-title { font-size: 56px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 28px; }
+.s-viewport { height: 760px; overflow: hidden; } /* = VIEW_H en settings-screen.js */
+.s-rows { transition: transform 260ms var(--ease); }
+.s-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 68px;
+  padding: 0 28px;
+  margin: 0 -28px;
+  border-radius: 16px;
+  font-size: 30px;
+  color: rgba(255, 255, 255, 0.82);
+}
+.s-row.focused { background: rgba(255, 255, 255, 0.14); color: #fff; }
+.s-row.moving { background: #fff; color: #000; }
+.s-row.off { color: var(--fg-faint); }
+.s-row.off.focused { color: rgba(255, 255, 255, 0.6); }
+.s-header {
+  height: 56px;
+  margin-top: 24px;
+  align-items: flex-end;
+  padding-bottom: 8px;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--fg-dim);
+}
+.s-header:first-child { margin-top: 0; }
+.s-val { font-size: 26px; color: var(--fg-dim); }
+.s-row.focused .s-val { color: #fff; }
+.s-row.moving .s-val { color: #000; }
+.s-hint {
+  position: absolute;
+  left: 80px;
+  bottom: 48px;
+  font-size: 22px;
+  color: var(--fg-dim);
+}
+
+.hidden { display: none; }
