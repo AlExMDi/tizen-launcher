@@ -30,6 +30,7 @@ const STRINGS = {
     inputFailed: 'No se pudo cambiar a {name}',
     mockLaunch: '{name} (mock: aquí se abriría la app)',
     noApps: 'No hay apps visibles. Pulsa OK en Ajustes.',
+    serviceDown: 'No responde el servicio de TizenBrew: las apps no se abrirán. Reabre el módulo.',
     // Pantalla de ajustes
     sAppsTitle: 'Apps en la lista',
     sGeneralTitle: 'General',
@@ -63,6 +64,7 @@ const STRINGS = {
     inputFailed: 'Could not switch to {name}',
     mockLaunch: '{name} (mock: the app would open here)',
     noApps: 'No visible apps. Press OK on Settings.',
+    serviceDown: 'TizenBrew service is not responding: apps will not open. Reopen the module.',
     sAppsTitle: 'Apps in the list',
     sGeneralTitle: 'General',
     sClock: 'Time format',

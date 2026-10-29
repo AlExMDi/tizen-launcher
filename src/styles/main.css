@@ -124,7 +124,7 @@ html, body {
   transition: opacity 420ms var(--ease), transform 520ms var(--ease);
 }
 .hero-layer.visible { opacity: 1; transform: scale(1); }
-.hero-img { max-width: 340px; max-height: 340px; }
+.hero-img { max-width: 340px; max-height: 340px; border-radius: 56px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45); }
 .hero-mono {
   width: 300px;
   height: 300px;

@@ -1,4 +1,4 @@
-import { platform } from './platform/index.js';
+import { detectPlatform } from './platform/index.js';
 import { actionFor, digitOf } from './keys.js';
 import { getSettings, onSettingsChange, updateSettings } from './settings.js';
 import { buildAppList, toSaved } from './apps.js';
@@ -11,6 +11,8 @@ import { createBackground } from './ui/background.js';
 import { createSettingsScreen } from './ui/settings-screen.js';
 
 const $ = (id) => document.getElementById(id);
+
+let platform = null; // se decide en boot() (ver platform/index.js)
 
 const state = {
   installed: [], // lo que devuelve la plataforma
@@ -151,6 +153,9 @@ async function boot() {
   startClock(s);
   background.start(s); // no esperamos: la lista se pinta mientras carga el fondo
 
+  const detected = await detectPlatform();
+  platform = detected.platform;
+  if (detected.warning) toast(t('serviceDown'), 8000);
   await platform.init();
   const [installed, inputs, model] = await Promise.all([
     platform.getInstalledApps().catch(() => []),

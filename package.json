@@ -31,7 +31,8 @@
     "check": "node scripts/check.mjs",
     "wgt": "sh scripts/package-wgt.sh",
     "check:build": "node scripts/check-build.mjs",
-    "icon": "node scripts/gen-icon.mjs"
+    "icon": "node scripts/gen-icon.mjs",
+    "check:tizenbrew": "node scripts/check-tizenbrew.mjs"
   },
   "license": "MIT",
   "devDependencies": {
@@ -39,5 +40,6 @@
     "acorn": "8.19.0",
     "playwright": "1.64.1",
     "vite": "8.3.5"
-  }
+  },
+  "serviceFile": "service/service.js"
 }

@@ -49,12 +49,17 @@ npm run check -- http://localhost:5173/ settings
 npm run build && npm run check:build
 ```
 
+```bash
+npm run check:tizenbrew
+```
+
 `check:build` comprueba que `dist/assets/app.js` se parsea como ES2019 y que el CSS no usa features posteriores a M85. Después abre `dist/index.html` desde `file://`, como un .wgt, con un `window.tizen` simulado para ejercitar la capa real.
 
 ### Estructura
 
 ```
-src/platform/   index.js elige tizen.js (real) o mock.js. Único sitio con tizen.*
+src/platform/   index.js elige tizen.js (.wgt), tizenbrew.js (módulo) o mock.js (Mac)
+service/        servicio Node.js del módulo de TizenBrew (único sitio con tizen.* en ese modo)
 src/keys.js     keycodes del mando (Back = 10009, colores 403–406)
 src/config.js   favoritos (por nombre + appId fallback), fondos, visor de TV
 src/settings.js ajustes en localStorage con try/catch y validación
@@ -83,8 +88,9 @@ TizenBrew no instala nada en la tele: descarga el módulo desde GitHub a través
 
 TizenBrew registra esas `keys` antes de abrir el módulo.
 
-1. **Modo desarrollador con IP 127.0.0.1.** En la tele, abre *Apps* y escribe `12345` con el mando. Activa *Developer mode*, pon `127.0.0.1` en *Host PC IP*, acepta y **reinicia la tele** (mantén pulsado el botón de encendido hasta ver el logo). TizenBrew necesita esa IP porque su servicio se conecta él mismo al depurador de la app.
-2. **Instala TizenBrew.** Descarga *TizenBrew Installer* para macOS desde las releases de `reisxd/TizenBrewInstaller` y dale permisos de ejecución si hace falta (`chmod +x`). Ábrelo y pulsa el botón de instalar TizenBrew. Lo de iniciar sesión con la cuenta Samsung y crear un certificado solo se pide a partir de Tizen 7.
+1. **Modo desarrollador con la IP de tu Mac.** En la tele, abre *Apps* y escribe `12345` con el mando. Activa *Developer mode*, pon la IP de tu Mac en *Host PC IP* (*Ajustes del Sistema → Wi-Fi → Detalles*), acepta y **reinicia la tele** (mantén pulsado el botón de encendido hasta ver el logo).
+2. **Instala TizenBrew.** Descarga *TizenBrew Installer* para macOS desde [las releases de `reisxd/TizenBrewInstaller`](https://github.com/reisxd/TizenBrewInstaller/releases/latest). Ejecútalo desde Terminal (`chmod +x tizenbrew-installer-…` si hace falta), con el Mac y la tele en la misma red, y pulsa *Install TizenBrew*. Lo de iniciar sesión con la cuenta Samsung solo se pide a partir de Tizen 7. Al terminar, TizenBrew aparece en *Apps* de la tele.
+   - **Después, cambia la Host PC IP a `127.0.0.1`** (mismo menú `12345`) y reinicia. Los métodos de instalación alternativos de la documentación oficial lo piden de forma explícita: el servicio de TizenBrew se conecta él mismo al depurador de la app y para eso necesita esa IP. Si TizenBrew no abre los módulos, este es el primer sitio que hay que revisar.
 3. **Publica el módulo.** Sube este repo a GitHub con `dist/` incluido:
 
    ```bash
@@ -96,10 +102,12 @@ TizenBrew registra esas `keys` antes de abrir el módulo.
 5. **Ábrelo** desde la lista de módulos. Para que arranque directamente al abrir TizenBrew: *Settings* → *Autolaunch Settings* → *Launcher*.
 6. **Actualizar.** jsDelivr cachea las ramas durante horas. Usa un tag nuevo (cambia el módulo en TizenBrew) o purga la caché abriendo `https://purge.jsdelivr.net/gh/tu-usuario/tizen-launcher@main/package.json` y lo mismo para `dist/index.html`, `dist/assets/app.js` y `dist/assets/style.css`.
 
-**Limitaciones dentro de TizenBrew** (corre con los privilegios de TizenBrew, no con los de `tizen/config.xml`):
+**Cómo funciona dentro de TizenBrew:** la página del módulo es una web normal servida desde `http://127.0.0.1:8081` y **no tiene `window.tizen`**. TizenBrew solo da acceso a la API de Tizen a los *servicios* de los módulos, que ejecuta con Node.js. Por eso el `package.json` declara `"serviceFile": "service/service.js"`: una mini API HTTP en `127.0.0.1:8183` (`/apps`, `/launch`, `/icon`, `/model`) que la página usa con `fetch` (`src/platform/tizenbrew.js`). Además, el servicio lee los iconos reales de las apps, que son ficheros del sistema, y los sirve a la página. `npm run check:tizenbrew` reproduce todo esto en local.
 
-- No tiene `tv.window`, así que la sección Inputs es un único "TV" que abre el visor de TV en la última fuente usada.
-- Los iconos de las apps (`iconPath` es una ruta `file://`) pueden no cargar desde la página `http://127.0.0.1`. Si pasa, verás monogramas.
+**Limitaciones dentro de TizenBrew:**
+
+- Los servicios no tienen ventana, así que no pueden usar `tv.window`: la sección Inputs es un único "TV", que abre el visor de TV en la última fuente usada.
+- Si el launcher avisa de que *no responde el servicio de TizenBrew*, cierra y reabre el módulo. TizenBrew guarda en caché los servicios en marcha; si actualizas el módulo y el servicio antiguo sigue vivo, reinicia la tele.
 
 ## Instalar como .wgt con Tizen Studio
 
