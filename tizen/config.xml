@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  config.xml para instalar el launcher como .wgt (Tizen Studio / Tizen CLI).
+  `npm run wgt` lo copia junto a dist/ y empaqueta.
+
+  Privilegios mínimos (todos de nivel PUBLIC según la documentación de Samsung):
+    application.launch  → tizen.application.launch()
+    tv.inputdevice      → registrar teclas de colores y números
+    tv.window           → tvwindow.setSource() para los HDMI
+    internet            → solo para los fondos remotos opcionales (Picsum)
+  No hace falta application.info: getAppsInfo() funciona sin él; solo protege el campo `size`.
+-->
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets"
+        id="https://github.com/tizen-launcher" version="0.1.0" viewmodes="maximized">
+    <!-- package: 10 caracteres alfanuméricos. Cámbialo si choca con otra app tuya. -->
+    <tizen:application id="LnchrTV001.Launcher" package="LnchrTV001" required_version="3.0"/>
+    <name>Launcher</name>
+    <content src="index.html"/>
+    <icon src="icon.png"/>
+
+    <tizen:profile name="tv-samsung"/>
+    <feature name="http://tizen.org/feature/screen.size.all"/>
+
+    <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.inputdevice"/>
+    <tizen:privilege name="http://tizen.org/privilege/tv.window"/>
+    <tizen:privilege name="http://tizen.org/privilege/internet"/>
+
+    <!-- Lista blanca de red: solo el servicio de fondos remotos (y su CDN fastly.picsum.photos). -->
+    <access origin="https://picsum.photos" subdomains="true"/>
+
+    <!-- hwkey-event: recibir Back (10009). background-support=disable: al abrir otra app nos pausamos. -->
+    <tizen:setting screen-orientation="landscape" context-menu="disable" background-support="disable"
+                   encryption="disable" install-location="auto" hwkey-event="enable"/>
+</widget>
