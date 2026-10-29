@@ -84,6 +84,31 @@ var routes = {
     send(res, 200, { model: model });
   },
 
+  // Diagnóstico de iconos: para cada app visible, qué ruta da el sistema y si podemos leerla.
+  // Lo muestra la página con la tecla azul (src/ui/diag.js).
+  '/diag': function (req, res) {
+    getAppsInfo(function (list) {
+      var apps = [];
+      for (var i = 0; i < list.length; i++) if (list[i].show) apps.push(list[i]);
+      apps = apps.slice(0, 12);
+      var out = [];
+      var pending = apps.length;
+      if (!pending) return send(res, 200, { total: list.length, apps: out });
+      apps.forEach(function (a, idx) {
+        var path = String(a.iconPath || '').replace(/^file:\/\//, '');
+        if (!path) {
+          out[idx] = { name: a.name, iconPath: a.iconPath || null, read: 'sin iconPath' };
+          if (--pending === 0) send(res, 200, { total: list.length, apps: out });
+          return;
+        }
+        fs.readFile(path, function (e, data) {
+          out[idx] = { name: a.name, iconPath: a.iconPath, read: e ? (e.code || String(e)) : 'OK ' + data.length + ' B' };
+          if (--pending === 0) send(res, 200, { total: list.length, apps: out });
+        });
+      });
+    }, function (e) { fail(res, e); });
+  },
+
   '/icon': function (req, res, query) {
     var path = String(query.path || '').replace(/^file:\/\//, '');
     if (!allowedIcons[query.path] && !allowedIcons[path]) return send(res, 403, { error: 'icono no permitido' });

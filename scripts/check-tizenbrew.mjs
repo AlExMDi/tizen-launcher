@@ -90,6 +90,15 @@ await page.waitForTimeout(300);
 console.log('  llamadas:', calls.join(' · '));
 if (calls.join() !== 'launch:3201907018807,launch:org.tizen.tv-viewer') fail('llamadas inesperadas');
 
+// Panel de diagnóstico (azul = B en el teclado).
+await page.keyboard.press('b');
+await page.waitForFunction(() => document.querySelector('#diag .d-body').textContent.indexOf('Consultando') === -1);
+const diagText = await page.$eval('#diag .d-body', (e) => e.textContent);
+console.log('  diagnóstico:\n    ' + diagText.split('\n').slice(-4).join('\n    '));
+if (diagText.indexOf('Netflix · OK') === -1 || diagText.indexOf('YouTube · ENOENT') === -1) fail('diagnóstico inesperado');
+await page.screenshot({ path: 'shots/tizenbrew-diag.png' });
+await page.keyboard.press('Escape');
+
 // El servicio no debe servir ficheros arbitrarios.
 const forbidden = await fetch('http://127.0.0.1:8183/icon?path=' + encodeURIComponent('/etc/passwd')).then((r) => r.status);
 if (forbidden !== 403) fail('/icon sirvió una ruta no permitida (' + forbidden + ')');

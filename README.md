@@ -26,6 +26,7 @@ Abre `http://localhost:5173`. En el navegador se usa `src/platform/mock.js`: "la
 | Back | Esc o Backspace | Cerrar ajustes (en la home no hace nada) |
 | Rojo | R | Ajustes |
 | Verde | G | Siguiente fondo |
+| Azul | B | Diagnóstico: plataforma y estado de los iconos de cada app |
 | 1–9 | 1–9 | Saltar al elemento N |
 
 Parámetros de URL para simular casos de la tele:

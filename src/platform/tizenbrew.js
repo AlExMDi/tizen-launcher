@@ -78,4 +78,13 @@ export const tizenbrewPlatform = {
   getDeviceModel() {
     return get('/model').then((b) => b.model || '', () => '');
   },
+
+  /** Para el panel de diagnóstico: qué ve el servicio y si la página recibe cada icono. */
+  diagnose() {
+    return get('/diag', 8000).then((body) => Promise.all(body.apps.map((a) => {
+      if (!a.iconPath) return Object.assign({ http: '-' }, a);
+      return fetch(BASE + '/icon?path=' + encodeURIComponent(a.iconPath))
+        .then((r) => Object.assign({ http: String(r.status) }, a), (e) => Object.assign({ http: 'error ' + e.message }, a));
+    })).then((apps) => ({ total: body.total, apps: apps })));
+  },
 };

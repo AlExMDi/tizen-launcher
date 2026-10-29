@@ -9,6 +9,7 @@ import { startClock, updateClock } from './ui/clock.js';
 import { toast } from './ui/toast.js';
 import { createBackground } from './ui/background.js';
 import { createSettingsScreen } from './ui/settings-screen.js';
+import { createDiag } from './ui/diag.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -92,6 +93,7 @@ function refreshHome() {
 const hero = createHero($('hero-a'), $('hero-b'));
 const home = createHome($('list'), { onFocus: (item) => hero.show(item) });
 const background = createBackground($('bg-a'), $('bg-b'));
+const diag = createDiag($('diag'));
 const settingsScreen = createSettingsScreen($('settings'), {
   getApps: () => state.apps,
   setApps: (list) => {
@@ -119,6 +121,10 @@ function onKey(e) {
   e.preventDefault(); // evita scroll del navegador y que Back cierre la app
 
   // Si hay un modal abierto, se queda con todas las teclas (Back lo cierra).
+  if (diag.isOpen()) {
+    if (action === 'back' || action === 'blue') diag.close();
+    return;
+  }
   if (settingsScreen.isOpen()) {
     settingsScreen.handle(action);
     return;
@@ -139,6 +145,8 @@ function onKey(e) {
     if (n > 0) home.focusIndex(n - 1);
   } else if (action === 'green') {
     background.next();
+  } else if (action === 'blue') {
+    diag.open(platform, state);
   }
   // 'back' en la pantalla principal no hace nada a propósito (ver PLAN.md, duda 4).
 }
