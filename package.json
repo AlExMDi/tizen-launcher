@@ -1,0 +1,43 @@
+{
+  "name": "tizen-launcher",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Launcher minimalista para Samsung TV (Tizen 6.5). Módulo de TizenBrew y .wgt.",
+  "packageType": "app",
+  "appName": "Launcher",
+  "appPath": "dist/index.html",
+  "keys": [
+    "ColorF0Red",
+    "ColorF1Green",
+    "ColorF2Yellow",
+    "ColorF3Blue",
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "backgrounds": "node scripts/gen-backgrounds.mjs",
+    "check": "node scripts/check.mjs",
+    "wgt": "sh scripts/package-wgt.sh",
+    "check:build": "node scripts/check-build.mjs",
+    "icon": "node scripts/gen-icon.mjs"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@fontsource-variable/inter": "5.3.0",
+    "acorn": "8.19.0",
+    "playwright": "1.64.1",
+    "vite": "8.3.5"
+  }
+}
